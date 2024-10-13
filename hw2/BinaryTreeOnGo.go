@@ -1,11 +1,13 @@
-package BinaryTree
+package BinaryTreeOnGo
 
-import "errors"
+import (
+	"errors"
+)
 
 type BST[T ~int | ~float32] interface {
-	IsExist(elem T) (error, int)
-	Add(elem T)
-	Delete(elem T)
+	IsExist(elem T) (*Node[T], error)
+	Add(elem T) *Node[T]
+	Delete(elem T) *Node[T]
 }
 
 type Node[T ~int | ~float32] struct {
@@ -15,14 +17,14 @@ type Node[T ~int | ~float32] struct {
 	right *Node[T]
 }
 
-func (n *Node[T]) InitEmptyNode() *Node[T] {
+func InitEmptyNode[T ~int | ~float32]() *Node[T] {
 	return &Node[T]{
 		left:  nil,
 		right: nil,
 	}
 }
 
-func (n *Node[T]) InitNodeWithVal(node *Node[T]) *Node[T] {
+func InitNodeWithVal[T ~int | float32](node *Node[T]) *Node[T] {
 	return &Node[T]{
 		val:   node.val,
 		ind:   node.ind,
@@ -45,13 +47,16 @@ type BinarySearchTree[T ~int | ~float32] struct {
 	root *Node[T]
 }
 
-func (bst *BinarySearchTree[T]) InitBST() *Node[T] {
-	return bst.root.InitEmptyNode()
-
+func InitBST[T ~int | ~float32]() *BinarySearchTree[T] {
+	return &BinarySearchTree[T]{
+		root: InitEmptyNode[T](),
+	}
 }
 
-func (bst *BinarySearchTree[T]) InitBSTWithVal(rootNode *Node[T]) *Node[T] {
-	return bst.root.InitNodeWithVal(rootNode)
+func InitBSTWithVal[T ~int | ~float32](rootNode *Node[T]) *BinarySearchTree[T] {
+	return &BinarySearchTree[T]{
+		root: rootNode,
+	}
 }
 
 func (bst *BinarySearchTree[T]) FindMin(node *Node[T]) *Node[T] {
@@ -120,7 +125,7 @@ func (bst *BinarySearchTree[T]) isExist(val T, n *Node[T]) *Node[T] {
 	}
 }
 
-func (bst *BinarySearchTree[T]) IsExist(val T, n *Node[T]) (*Node[T], error) {
+func (bst *BinarySearchTree[T]) IsExist(val T) (*Node[T], error) {
 	temp := bst.isExist(val, bst.root)
 	if temp != nil {
 		return temp, nil

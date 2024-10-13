@@ -104,17 +104,27 @@ func (bst *BinarySearchTree[T]) Delete(val T) *Node[T] {
 	if bst.root == nil || nodeToDelete == nil {
 		return nil
 	}
+	if nodeToDelete.left == nil {
+		nodeToDelete = nodeToDelete.right
+		return nodeToDelete
+	}
+	if nodeToDelete.right == nil {
+		nodeToDelete = nodeToDelete.left
+		return nodeToDelete
+	}
+	if nodeToDelete.right == nil && nodeToDelete.left == nil {
+		return nil
+	}
 	if val < bst.root.val {
 		temp := bst.FindMax(nodeToDelete.left)
 		bst.root.swap(temp, nodeToDelete)
-		nodeToDelete = nil
-		return temp
-	} else {
-		temp := bst.FindMin(nodeToDelete.right)
-		bst.root.swap(temp, nodeToDelete)
-		nodeToDelete = nil
-		return temp
+		temp = nil
+		return nodeToDelete
 	}
+	temp := bst.FindMin(nodeToDelete.right)
+	bst.root.swap(temp, nodeToDelete)
+	temp = nil
+	return nodeToDelete
 }
 
 func (bst *BinarySearchTree[T]) isExist(val T, n *Node[T]) *Node[T] {

@@ -11,37 +11,42 @@ type BST[T ~int | ~float32] interface {
 }
 
 type Node[T ~int | ~float32] struct {
-	val   T
-	ind   uint
-	left  *Node[T]
-	right *Node[T]
+	val    T
+	ind    uint
+	left   *Node[T]
+	right  *Node[T]
+	parent *Node[T]
 }
 
 func InitEmptyNode[T ~int | ~float32]() *Node[T] {
 	return &Node[T]{
-		left:  nil,
-		right: nil,
+		val:    0,
+		ind:    0,
+		left:   nil,
+		right:  nil,
+		parent: nil,
 	}
 }
 
 func InitNodeWithVal[T ~int | float32](node *Node[T]) *Node[T] {
 	return &Node[T]{
-		val:   node.val,
-		ind:   node.ind,
-		left:  node.left,
-		right: node.right,
+		val:    node.val,
+		ind:    node.ind,
+		left:   node.left,
+		right:  node.right,
+		parent: node.parent,
 	}
 }
 
-func (n *Node[T]) swap(n1 *Node[T], n2 *Node[T]) {
-	temp := n1.val
-	n1.val = n2.val
-	n2.val = temp
+// func (n *Node[T]) swap(n1 *Node[T], n2 *Node[T]) {
+// 	temp := n1.val
+// 	n1.val = n2.val
+// 	n2.val = temp
 
-	othertemp := n1.ind
-	n1.ind = n2.ind
-	n2.ind = othertemp
-}
+// 	othertemp := n1.ind
+// 	n1.ind = n2.ind
+// 	n2.ind = othertemp
+// }
 
 type BinarySearchTree[T ~int | ~float32] struct {
 	root *Node[T]
@@ -83,30 +88,30 @@ func (bst *BinarySearchTree[T]) FindMax(node *Node[T]) *Node[T] {
 
 func (bst *BinarySearchTree[T]) Add(val T, node *Node[T]) *Node[T] {
 	if node != nil {
-		if val < bst.root.val {
+		if val < node.val {
 			node.left = bst.Add(val, node.left)
+			node.left.parent = node
 		} else {
 			node.right = bst.Add(val, node.right)
+			node.right.parent = node
+		}
+	} else {
+		node = &Node[T]{
+			val:    val,
+			parent: nil,
 		}
 	}
 	return node
 }
 
-func (bst *BinarySearchTree[T]) Delete(val T) *Node[T] {
-	nodeToDelete := bst.isExist(val, bst.root)
-	if bst.root == nil || nodeToDelete == nil {
-		return nil
-	}
-	if val < bst.root.val {
-		temp := bst.FindMax(nodeToDelete.left)
-		bst.root.swap(temp, nodeToDelete)
-		nodeToDelete = nil
-		return temp
-	} else {
-		temp := bst.FindMin(nodeToDelete.right)
-		bst.root.swap(temp, nodeToDelete)
-		nodeToDelete = nil
-		return temp
+func (bst *BinarySearchTree[T]) Delete(val T) {
+	if bst.root != nil {
+		nodeToDelete := bst.isExist(val, bst.root)
+		temp := nodeToDelete.parent
+		if temp.right.val == nodeToDelete.val {
+			temp.right = nil
+		}
+		temp.left = nil
 	}
 }
 
@@ -120,9 +125,8 @@ func (bst *BinarySearchTree[T]) isExist(val T, n *Node[T]) *Node[T] {
 
 	if n.val < val {
 		return bst.isExist(val, n.right)
-	} else {
-		return bst.isExist(val, n.left)
 	}
+	return bst.isExist(val, n.left)
 }
 
 func (bst *BinarySearchTree[T]) IsExist(val T) (*Node[T], error) {

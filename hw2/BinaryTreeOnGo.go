@@ -57,25 +57,23 @@ func (bst *BinarySearchTree[T]) InitBSTWithVal(rootNode *Node[T]) *Node[T] {
 func (bst *BinarySearchTree[T]) FindMin(node *Node[T]) *Node[T] {
 	if node == nil {
 		return nil
-	} else {
-		temp := node
-		for temp.left != nil {
-			temp = temp.left
-		}
-		return temp
 	}
+	temp := node
+	for temp.left != nil {
+		temp = temp.left
+	}
+	return temp
 }
 
 func (bst *BinarySearchTree[T]) FindMax(node *Node[T]) *Node[T] {
 	if node == nil {
 		return nil
-	} else {
-		temp := node
-		for temp.right != nil {
-			temp = temp.right
-		}
-		return temp
 	}
+	temp := node
+	for temp.right != nil {
+		temp = temp.right
+	}
+	return temp
 }
 
 func (bst *BinarySearchTree[T]) Add(val T, node *Node[T]) *Node[T] {
@@ -93,7 +91,8 @@ func (bst *BinarySearchTree[T]) Delete(val T) *Node[T] {
 	nodeToDelete := bst.isExist(val, bst.root)
 	if bst.root == nil || nodeToDelete == nil {
 		return nil
-	} else if val < bst.root.val {
+	}
+	if val < bst.root.val {
 		temp := bst.FindMax(nodeToDelete.left)
 		bst.root.swap(temp, nodeToDelete)
 		nodeToDelete = nil
@@ -125,8 +124,7 @@ func (bst *BinarySearchTree[T]) IsExist(val T, n *Node[T]) (*Node[T], error) {
 	temp := bst.isExist(val, bst.root)
 	if temp != nil {
 		return temp, nil
-	} else {
-		err := errors.New("Node does not exits")
-		return nil, err
 	}
+	err := errors.New("Node does not exits")
+	return nil, err
 }

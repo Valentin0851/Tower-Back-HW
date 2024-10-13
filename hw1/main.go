@@ -37,6 +37,43 @@ func InitNodeWithVal[T ~int | float32](node *Node[T]) *Node[T] {
 	}
 }
 
+func (n *Node[T]) delete() {
+	temp := n.parent
+	if temp.right.val == n.val {
+		temp.right = nil
+	} else {
+		temp.left = nil
+	}
+}
+
+func (n1 *Node[T]) swap(n2 *Node[T]) {
+	temp := n1.parent
+	left := n1.left
+	right := n1.right
+	ind := n1.ind
+	val := n1.val
+	temp2 := n2.parent
+	n1.left = n2.left
+	n1.right = n2.right
+	n1.val = n2.val
+	n1.ind = n2.ind
+	if temp2.right.val == n2.val {
+		temp2.right = n1
+	} else {
+		temp2.left = n1
+	}
+
+	n2.ind = ind
+	n2.left = left
+	n2.right = right
+	n2.val = val
+	if temp.right.val == val {
+		temp.right = n2
+	} else {
+		temp.left = n2
+	}
+}
+
 // func (n *Node[T]) swap(n1 *Node[T], n2 *Node[T]) {
 // 	temp := n1.val
 // 	n1.val = n2.val
@@ -103,15 +140,36 @@ func (bst *BinarySearchTree[T]) Add(val T, node *Node[T]) *Node[T] {
 	return node
 }
 
-func (bst *BinarySearchTree[T]) Delete(val T) {
-	if bst.root != nil {
-		nodeToDelete := bst.isExist(val, bst.root)
-		temp := nodeToDelete.parent
-		if temp.right.val == nodeToDelete.val {
-			temp.right = nil
-		}
-		temp.left = nil
+func (bst *BinarySearchTree[T]) Delete(val T) *Node[T] {
+	nodeToDelete := bst.isExist(val, bst.root)
+	if bst.root == nil || nodeToDelete == nil {
+		return nil
 	}
+	if nodeToDelete.right == nil && nodeToDelete.left == nil {
+		nodeToDelete.delete()
+		return nil
+	}
+	if nodeToDelete.left == nil {
+		nodeToDelete.swap(nodeToDelete.right)
+		return nodeToDelete
+	}
+	if nodeToDelete.right == nil {
+		nodeToDelete.swap(nodeToDelete.left)
+		return nodeToDelete
+	}
+	temp := bst.FindMax(nodeToDelete.left)
+	nodeToDelete.val = temp.val
+	temp.delete()
+	return nodeToDelete
+	// if bst.root != nil {
+	// 	nodeToDelete := bst.isExist(val, bst.root)
+	// 	temp := nodeToDelete.parent
+	// 	if temp.right.val == nodeToDelete.val {
+	// 		temp.right = nil
+	// 	} else {
+	// 		temp.left = nil
+	// 	}
+	// }
 }
 
 func (bst *BinarySearchTree[T]) isExist(val T, n *Node[T]) *Node[T] {
